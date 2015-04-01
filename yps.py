@@ -35,7 +35,7 @@ def sync_playlist(config_path):
     with open(config_path, 'r') as config_handler:
         config_data = json.load(config_handler)
 
-    current_dir = os.curdir  # save dir to change back to it later
+    current_dir = os.getcwd()  # save dir to change back to it later
     os.chdir(os.path.dirname(config_path))  # change dir to the one you want to save the videos to
     subprocess.call([YOUTUBE_DL_PATH, config_data['youtube_playlist']])
 
@@ -60,7 +60,7 @@ if args.sync:
     print_info('Found ' + str(len(all_found_configs)) + ' config files, proceeding to sync')
 
     for config_file in all_found_configs:
-        success = sync_playlist(config_file)
+        success = sync_playlist(os.path.abspath(config_file))
         if not success:
             print_info('Failed to sync config ' + config_file)
         else:
