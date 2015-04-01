@@ -25,11 +25,13 @@ def save_config(directory, playlist_url):
     with open(config_loc, 'w') as config_outfile:
         json.dump(config_data, config_outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
-    print "Saved config to " + config_loc
+    print_info('Saved config to ' + config_loc)
 
 
 def sync_playlist(config_path):
+    print_info('Starting to process config file: ' + config_path)
     if not os.path.exists(config_path):
+        print_info('Config path does not exist')
         return False
 
     with open(config_path, 'r') as config_handler:
