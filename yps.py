@@ -58,7 +58,7 @@ def sync_playlist(config_path):
     return True
 
 parser = argparse.ArgumentParser(description='Download and synchronise a directory with a youtube playlist')
-parser.add_argument('--sync', required=False)
+parser.add_argument('--sync', required=False, nargs='?', const='.')
 parser.add_argument('--init', metavar='playlist_url', help='words', required=False)
 parser.add_argument('--dir', metavar='directory', required=False, default='.', help='The directory to act on')
 parser.add_argument('--format', required=False)
