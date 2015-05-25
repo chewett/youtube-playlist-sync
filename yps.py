@@ -14,6 +14,9 @@ CONFIG_FILENAME = 'yps.json'
 def print_info(info):
     print 'YPS: ' + info
 
+def run_in_subprocess(args):
+    print_info(' '.join(args))
+    subprocess.call(args)
 
 def save_config(directory, playlist_url):
     config_loc = os.path.expanduser(os.path.join(directory, CONFIG_FILENAME))
@@ -22,10 +25,16 @@ def save_config(directory, playlist_url):
 
     config_data = {'youtube_playlist': playlist_url}
 
-    with open(config_loc, 'w') as config_outfile:
-        json.dump(config_data, config_outfile, sort_keys=True, indent=4, separators=(',', ': '))
-
+    save_config_data(config_loc, config_data)
     print_info('Saved config to ' + config_loc)
+
+def save_config_data(config_loc, data):
+    with open(config_loc, 'w') as config_outfile:
+        json.dump(data, config_outfile, sort_keys=True, indent=4, separators=(',', ': '))
+
+def get_config(directory):
+    with open(directory, 'r') as config_handler:
+        return json.load(config_handler)
 
 
 def sync_playlist(config_path):
@@ -34,12 +43,15 @@ def sync_playlist(config_path):
         print_info('Config path does not exist')
         return False
 
-    with open(config_path, 'r') as config_handler:
-        config_data = json.load(config_handler)
+    config_data =get_config(config_path)
 
     current_dir = os.getcwd()  # save dir to change back to it later
     os.chdir(os.path.dirname(config_path))  # change dir to the one you want to save the videos to
-    subprocess.call([YOUTUBE_DL_PATH, config_data['youtube_playlist']])
+
+    if 'format' in config_data:
+        run_in_subprocess([YOUTUBE_DL_PATH, '-f', config_data['format'], config_data['youtube_playlist']])
+    else:
+        run_in_subprocess([YOUTUBE_DL_PATH, config_data['youtube_playlist']])
 
     os.chdir(current_dir)  # change back to original dir
 
@@ -49,6 +61,7 @@ parser = argparse.ArgumentParser(description='Download and synchronise a directo
 parser.add_argument('--sync', required=False)
 parser.add_argument('--init', required=False)
 parser.add_argument('--dir', required=False)
+parser.add_argument('--format', required=False)
 args = parser.parse_args()
 
 if args.sync:
@@ -73,6 +86,13 @@ elif args.init:
     save_dir = args.dir
 
     save_config(save_dir, new_youtube_playlist)
+
+elif args.format:
+    config = get_config(CONFIG_FILENAME)
+    config['format'] = args.format
+    save_config_data(CONFIG_FILENAME, config)
+    print_info('Added format ' + args.format)
+
 
 else:
     parser.print_help()
