@@ -59,8 +59,8 @@ def sync_playlist(config_path):
 
 parser = argparse.ArgumentParser(description='Download and synchronise a directory with a youtube playlist')
 parser.add_argument('--sync', required=False)
-parser.add_argument('--init', required=False)
-parser.add_argument('--dir', required=False)
+parser.add_argument('--init', metavar='playlist_url', help='words', required=False)
+parser.add_argument('--dir', metavar='directory', required=False, default='.', help='The directory to act on')
 parser.add_argument('--format', required=False)
 args = parser.parse_args()
 
@@ -88,9 +88,11 @@ elif args.init:
     save_config(save_dir, new_youtube_playlist)
 
 elif args.format:
-    config = get_config(CONFIG_FILENAME)
+    yps_config_loc = os.path.join(args.dir, CONFIG_FILENAME)
+
+    config = get_config(yps_config_loc)
     config['format'] = args.format
-    save_config_data(CONFIG_FILENAME, config)
+    save_config_data(yps_config_loc, config)
     print_info('Added format ' + args.format)
 
 
