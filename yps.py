@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import fnmatch
@@ -12,7 +12,7 @@ CONFIG_FILENAME = 'yps.json'
 
 
 def print_info(info):
-    print 'YPS: ' + info
+    print('YPS: ' + info)
 
 def run_in_subprocess(args):
     print_info(' '.join(args))
