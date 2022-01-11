@@ -48,10 +48,22 @@ def sync_playlist(config_path):
     current_dir = os.getcwd()  # save dir to change back to it later
     os.chdir(os.path.dirname(config_path))  # change dir to the one you want to save the videos to
 
+<<<<<<< Updated upstream
     if 'format' in config_data:
         run_in_subprocess([YOUTUBE_DL_PATH, '-f', config_data['format'], config_data['youtube_playlist']])
     else:
         run_in_subprocess([YOUTUBE_DL_PATH, config_data['youtube_playlist']])
+=======
+    if config_data['format'] != None:
+        if shutil.which('ffmpeg') == None:
+            print_info('ffmpeg must be installed for mp3 downloads. Read this guide for help installing ffmpeg for Windows: https://bit.ly/3eoW2MD.')
+            time.sleep(5000)
+            exit()
+        else:
+            run_in_subprocess([YOUTUBE_DL_PATH, '--extract-audio', '--audio-format', config_data['format'], '-o', r'%(title)s.%(ext)s', config_data['youtube_playlist']])
+    else:
+        run_in_subprocess([YOUTUBE_DL_PATH, config_data['youtube_playlist'], '-o', r'%(title)s.%(ext)s'])
+>>>>>>> Stashed changes
 
     os.chdir(current_dir)  # change back to original dir
 
