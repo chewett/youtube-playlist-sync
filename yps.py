@@ -5,7 +5,8 @@ import fnmatch
 import os
 import json
 import subprocess
-
+import shutil
+import time
 
 YOUTUBE_DL_PATH = 'youtube-dl'
 CONFIG_FILENAME = 'yps.json'
@@ -18,12 +19,12 @@ def run_in_subprocess(args):
     print_info(' '.join(args))
     subprocess.call(args)
 
-def save_config(directory, playlist_url):
+def save_config(directory, playlist_url, fileformat=None):
     config_loc = os.path.expanduser(os.path.join(directory, CONFIG_FILENAME))
     if os.path.exists(config_loc):
         exit('Configuration at ' + config_loc + ' already exists. Not saving new config.')
 
-    config_data = {'youtube_playlist': playlist_url}
+    config_data = {'directory': directory,'youtube_playlist': playlist_url, 'format': fileformat}
 
     save_config_data(config_loc, config_data)
     print_info('Saved config to ' + config_loc)
@@ -43,17 +44,11 @@ def sync_playlist(config_path):
         print_info('Config path does not exist')
         return False
 
-    config_data =get_config(config_path)
+    config_data = get_config(config_path)
 
     current_dir = os.getcwd()  # save dir to change back to it later
     os.chdir(os.path.dirname(config_path))  # change dir to the one you want to save the videos to
 
-<<<<<<< Updated upstream
-    if 'format' in config_data:
-        run_in_subprocess([YOUTUBE_DL_PATH, '-f', config_data['format'], config_data['youtube_playlist']])
-    else:
-        run_in_subprocess([YOUTUBE_DL_PATH, config_data['youtube_playlist']])
-=======
     if config_data['format'] != None:
         if shutil.which('ffmpeg') == None:
             print_info('ffmpeg must be installed for mp3 downloads. Read this guide for help installing ffmpeg for Windows: https://bit.ly/3eoW2MD.')
@@ -63,7 +58,6 @@ def sync_playlist(config_path):
             run_in_subprocess([YOUTUBE_DL_PATH, '--extract-audio', '--audio-format', config_data['format'], '-o', r'%(title)s.%(ext)s', config_data['youtube_playlist']])
     else:
         run_in_subprocess([YOUTUBE_DL_PATH, config_data['youtube_playlist'], '-o', r'%(title)s.%(ext)s'])
->>>>>>> Stashed changes
 
     os.chdir(current_dir)  # change back to original dir
 
@@ -96,8 +90,9 @@ if args.sync:
 elif args.init:
     new_youtube_playlist = args.init
     save_dir = args.dir
+    save_format = args.format
 
-    save_config(save_dir, new_youtube_playlist)
+    save_config(save_dir, new_youtube_playlist, save_format)
 
 elif args.format:
     yps_config_loc = os.path.join(args.dir, CONFIG_FILENAME)
